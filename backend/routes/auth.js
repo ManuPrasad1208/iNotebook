@@ -5,6 +5,8 @@ const router = express.Router();
 
 const User = require("../models/User.js");
 
+const bcrypt = require('bcrypt');
+
 //express validator
 const { body, validationResult } = require("express-validator");
 
@@ -17,16 +19,19 @@ router.post(
     body('email',"Enter a valid email").isEmail(),
     body('password',"password must be at least 5 characters").isLength({min:5})
   ],
-  (req, res) => {
+  async (req, res) => {
     console.log(req.body);
     const result = validationResult(req);
     if (!result.isEmpty()) {
       return res.send(`Hello, ${req.body}!`);
     }
+    const saltRounds = 10;
+    const salt= await bcrypt.genSalt(10);
+    const secpass=await bcrypt.hash(req.body.password,salt);
     // creating a new user
     User.create({
       name:req.body.name,
-      password:req.body.password,
+      password:secpass,
       email:req.body.email
     }).then(user=>res.json(user)).catch(err=>res.json(err));
     // res.send({ errors: result.array() });
