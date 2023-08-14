@@ -1,8 +1,11 @@
 //file name will start with capital letter since it is a model
-
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const NotesSchema = new Schema({
+  user:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'user'
+  },
   title:{
     type: String,
     required:true

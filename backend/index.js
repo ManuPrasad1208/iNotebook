@@ -10,7 +10,6 @@ app.use(express.json());//app.use is used as middleware . here to send and get d
 app.use('/api/auth',require('./routes/auth'));
 app.use('/api/notes',require('./routes/notes'));
 
-
 const port=3000;
 app.listen(port,()=>{
     console.log(`App listening at http://localhost:${port}`);
