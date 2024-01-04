@@ -30,17 +30,18 @@ router.post(
     }),
   ],
   async (req, res) => {
+    let success=false;
     console.log(req.body);
     const result = validationResult(req);
     if (!result.isEmpty()) {
-      return res.send(`Hello, ${req.body}!`);
+      return res.send(success,`Hello, ${req.body}!`);
     }
     try {
       let user = await User.findOne({ email: req.body.email });
       if (user) {
         return res
           .status(400)
-          .json({ error: "Sorry a user with this email already exists" });
+          .json({success,error: "Sorry a user with this email already exists" });
       }
 
       const saltRounds = 10;
@@ -59,8 +60,8 @@ router.post(
         },
       };
       const authtoken = jwt.sign(data, JWT_SECRET);
-
-      res.json({authtoken});
+      success=true;
+      res.json({success,authtoken});
       // res.send({ errors: result.array() });
     } catch (error) {
       console.error(error.message);
@@ -78,7 +79,7 @@ router.post(
     body("password", "password cannot be blank").exists(),
   ],
   async (req, res) => {
-
+    let success=false;
     const errors=validationResult(req);
     if(!errors.isEmpty()){
       return res.status(400).json({errors:errors.array()});
@@ -90,12 +91,14 @@ router.post(
     try{
       let user=await User.findOne({email});
       if(!user){
-        return res.status(400).json({error:"Please try to login with correct credentials"});
+        success=false;
+        return res.status(400).json({success,error:"Please try to login with correct credentials"});
       }
       //bcrypt compare password
       const passwordCompare=await bcrypt.compare(password,user.password);
       if(!passwordCompare){
-        return res.status(400).json({error:"Please try to login with correct credentials"});
+        success=false;
+        return res.status(400).json({success,error:"Please try to login with correct credentials"});
       }
       const data = {
         user: {
@@ -103,8 +106,8 @@ router.post(
         },
       };
       const authtoken = jwt.sign(data, JWT_SECRET);
-
-      res.json({authtoken});
+      success=true;
+      res.json({success,authtoken});
     }
 
     catch(error){
